@@ -1,6 +1,6 @@
 
-- name: CONFIGURE ACI
-  hosts: apic
+- name: PING
+  hosts: localhost
   connection: local
   gather_facts: False
   collections:
