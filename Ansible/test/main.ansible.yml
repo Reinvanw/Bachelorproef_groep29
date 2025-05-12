@@ -9,5 +9,8 @@
 
 
   tasks:
-    - name: Ping
+    - name: Ping1
+      ping:
+
+    - name: Ping2
       ping:
