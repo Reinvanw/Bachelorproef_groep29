@@ -1,0 +1,13 @@
+
+- name: CONFIGURE ACI
+  hosts: apic
+  connection: local
+  gather_facts: False
+  collections:
+
+  vars_files:
+
+
+  tasks:
+    - name: Ping
+      ping:
