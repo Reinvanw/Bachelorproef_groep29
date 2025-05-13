@@ -1,7 +1,6 @@
 
 - name: PING
-  hosts: localhost
-  connection: local
+  hosts: switch
   gather_facts: False
   collections:
 
@@ -9,8 +8,10 @@
 
 
   tasks:
-    - name: Ping1
-      ping:
+    - name: Run show version
+      ansible.builtin.wait_for_connection:
+        
 
-    - name: Ping2
-      ping:
+    - name: print output
+      debug:
+        var: output.stdout_lines

@@ -1,11 +1,12 @@
 - name: Reset switch via console
   hosts: switch
-  # connection: ansible.netcommon.network_cli
   gather_facts: False
-  # vars:
-  #   ansible_ssh_common_args: '-o PreferredAuthentications=password -o PubkeyAuthentication=no'
-  vars_files: "./password.yml"
   tasks:
+
+    - name: print key
+      debug:
+        msg: "{{ ansible_key_file }}"
+
     - name: Run show version
       cisco.ios.ios_command:
         commands: show version
