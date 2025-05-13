@@ -14,7 +14,6 @@ public class Ping {
 
     public Ping() {}
 
-    // Getters
     public String getIpAddress() {
         return ipAddress;
     }
@@ -27,7 +26,6 @@ public class Ping {
         return output;
     }
 
-    // Setters
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
     }
