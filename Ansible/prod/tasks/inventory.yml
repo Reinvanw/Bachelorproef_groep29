@@ -1,0 +1,12 @@
+switch:
+  hosts:
+    switch1:
+      ansible_host: 192.168.0.2
+      ansible_user: admin
+      ansible_password: admin
+      ansible_network_os: ios
+      ansible_connection: ansible.netcommon.network_cli
+      # ansible_ssh_common_args: "-o PubkeyAuthentication=no -o PreferredAuthentications=password"
+      # ansible_ssh_transfer_method: scp
+      # ansible_python_interpreter: /usr/bin/python3
+      # ansible_ssh_executable: /usr/bin/ssh

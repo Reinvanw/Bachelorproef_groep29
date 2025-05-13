@@ -1,0 +1,40 @@
+- name: Reset switch via console
+  hosts: switch
+  # connection: ansible.netcommon.network_cli
+  gather_facts: False
+  # vars:
+  #   ansible_ssh_common_args: '-o PreferredAuthentications=password -o PubkeyAuthentication=no'
+  vars_files: "./password.yml"
+  tasks:
+    - name: Run show version
+      cisco.ios.ios_command:
+        commands: show version
+      register: output
+
+    - name: Print output
+      debug:
+        var: output.stdout_lines
+
+    # # - name: print password
+    # #   debug:
+    # #     msg: "{{admin_password}}"
+
+    # - name: Send reset commands via expect over serial
+    #   expect:
+    #     command: "sudo screen /dev/ttyUSB0 9600"
+    #     responses:
+    #       ".*password for .*:": "{{ admin_password }}"
+    #       # 'Username:': 'admin\n'
+    #       # 'Password:': 'yourpassword\n'
+    #       ">": 'enable\n'
+    #       # 'Password:': 'enablepassword\n'
+    #       # '#': |
+    #       #   # write erase
+    #       #   # reload
+    #       #   # confirm
+    #       "#": "show run"
+    #   register: output
+
+    # - name: print output
+    #   debug:
+    #     msg: "{{ output }}"
