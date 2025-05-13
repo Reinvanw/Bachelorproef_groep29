@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-NoWireApplication<no_wire>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "no_wire.no_wire.NoWireApplication",
+            "projectName": "no_wire",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
