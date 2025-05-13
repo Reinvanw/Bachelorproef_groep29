@@ -1,8 +1,8 @@
 Building configuration...
 
-Current configuration : 9947 bytes
+Current configuration : 10049 bytes
 !
-! Last configuration change at 07:14:53 UTC Tue May 13 2025 by admin
+! Last configuration change at 09:32:44 UTC Tue May 13 2025 by admin
 !
 version 16.12
 no service pad
@@ -147,6 +147,7 @@ spanning-tree extend system-id
 memory free low-watermark processor 79468
 !
 username admin privilege 15 secret 9 $9$uoauzbchj3e35.$dNz/WMU/qzQKRCcFjaySPJaCxlXONVxjsZPYagrv/d2
+username student privilege 15 secret 9 $9$koz8pNSiiw5i7E$Erd48syBxZ7cMbaQuvVA5.cK0udUbLFSSkzVB3dN7Mw
 !
 redundancy
  mode sso
@@ -330,6 +331,7 @@ ip ssh version 2
 ip ssh pubkey-chain
   username admin
    key-hash ssh-rsa 6BF4BE620B53169927C062A39A5EAF9D reinvanw@reinvanw-Lenovo-Legion-5-15IMH05H
+   key-hash ssh-rsa C144191D9200DF0922D0B7D550CFC0E8 your-key-here
 !
 !
 !
