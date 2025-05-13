@@ -1,0 +1,96 @@
+
+
+- name: Reset switch
+  hosts: switch
+  gather_facts: no
+  tasks:
+
+    - name: get timestamp
+      set_fact:
+        timestamp: "{{ lookup('pipe', 'date +%Y%m%d_%H%M%S') }}"
+
+    - name: test hostname var
+      debug:
+        msg: "hostname is not set"
+      when: hostname is not defined
+
+    - name: test old_ip var
+      debug:
+        msg: "old_ip is not set"
+      when: old_ip is not defined
+
+    - name: test new_ip var
+      debug:
+        msg: "new_ip is not set"
+      when: new_ip is not defined
+
+    - name: test username var
+      debug:
+        msg: "username is not set"
+      when: username is not defined
+    
+    - name: test password var
+      debug:
+        msg: "password is not set"
+      when: password is not defined
+
+    - name: change ansible host ip 
+      set_fact:
+        ansible_host: "{{ old_ip }}"
+
+    - name: hash public key
+      shell: 
+        cmd: ssh-keygen -E md5 -lf {{ playbook_dir }}/keys/id_rsa.pub | awk '{print toupper(substr($2, 1)) | "tr -d \":\""}' | sed 's/^MD5//g'
+      register: public_key_output
+
+    - name: set public key public_key_hashed
+      set_fact:
+        public_key_hashed: "{{ public_key_output.stdout }}"
+
+    - name: print public key
+      debug:
+        msg: "{{ public_key_hashed }}"
+
+
+    - name: make output directory
+      file: 
+        path: "{{ playbook_dir }}/output/{{ hostname }}/"
+        state: directory
+        mode: '0755' 
+
+    - name: create new config
+      template:
+        src: "{{ playbook_dir }}/template/config.jinja"
+        dest: "{{ playbook_dir }}/output/{{ hostname }}/new_config_{{ timestamp }}.txt"
+      vars:
+        
+    - name: Backup the current running config
+      cisco.ios.ios_config:
+        backup: yes
+        backup_options:
+          filename: "backup_{{ timestamp }}.txt"
+          dir_path: "{{ playbook_dir }}/output/{{ hostname }}"
+
+    - name: Copy custom configuration file to the switch
+      ios_config:
+        src: "{{ playbook_dir }}/output/{{ hostname }}/new_config_{{ timestamp }}.txt" 
+        save_when: changed
+        timeout: 10
+      ignore_errors: yes
+
+    - name: save the configuration
+      ios_config:
+        save_when: always
+      ignore_errors: yes
+
+    - name: change ansible host ip 
+      set_fact:
+        ansible_host: "{{ new_ip }}"
+
+    - name: add student
+      ios_config:
+        lines:
+          - "username {{ username }} privilege 15 secret {{ password }}"
+        save_when: always
+      
+
