@@ -1,15 +1,4 @@
-- name: add switch host dynamically
-  hosts: localhost
-  gather_facts: no
-  tasks:
 
-
-    - name: add switch host dynamically
-      add_host:
-        name: "{{ item }}"
-        groups: switch
-      loop: "{{ groups['switch'] }}"
-      when: item not in groups['switch']
 
 - name: Reset switch
   hosts: switch
@@ -50,41 +39,58 @@
         ansible_host: "{{ old_ip }}"
 
     - name: hash public key
-      ansible.builtin.set_fact:
-        public_key_hashed: "{{ lookup('file', playbook_dir + '/keys/id_rsa.pub') | password_hash('md5') }}"
-      when: public_key is not defined
+      shell: 
+        cmd: ssh-keygen -E md5 -lf {{ playbook_dir }}/keys/id_rsa.pub | awk '{print toupper(substr($2, 1)) | "tr -d \":\""}' | sed 's/^MD5//g'
+      register: public_key_output
+
+    - name: set public key public_key_hashed
+      set_fact:
+        public_key_hashed: "{{ public_key_output.stdout }}"
+
+    - name: print public key
+      debug:
+        msg: "{{ public_key_hashed }}"
+
+
+    - name: make output directory
+      file: 
+        path: "{{ playbook_dir }}/output/{{ hostname }}/"
+        state: directory
+        mode: '0755' 
 
     - name: create new config
       template:
         src: "{{ playbook_dir }}/template/config.jinja"
-        dest: "{{ playbook_dir }}/output/{{ inventory_hostname }}/new_config_{{ timestamp }}.txt"
+        dest: "{{ playbook_dir }}/output/{{ hostname }}/new_config_{{ timestamp }}.txt"
       vars:
-        old_ip: "{{ old_ip }}"
-        new_ip: "{{ new_ip }}"
-        username: "{{ username }}"
-        password: "{{ password }}"
-        hostname: "{{ hostname }}"
         
     - name: Backup the current running config
       cisco.ios.ios_config:
         backup: yes
         backup_options:
           filename: "backup_{{ timestamp }}.txt"
-          dir_path: "{{ playbook_dir }}/output/{{ inventory_hostname }}"
+          dir_path: "{{ playbook_dir }}/output/{{ hostname }}"
 
-    # - name: Copy custom configuration file to the switch
-    #   ios_config:
-    #     src: "{{ playbook_dir }}/output/{{ inventory_hostname }}/new_config_{{ timestamp }}.txt" # Path to your local config file
-    #     save_when: never
+    - name: Copy custom configuration file to the switch
+      ios_config:
+        src: "{{ playbook_dir }}/output/{{ hostname }}/new_config_{{ timestamp }}.txt" 
+        save_when: changed
+        timeout: 10
+      ignore_errors: yes
 
-    # - name: save the configuration
-    #   ios_config:
-    #     save_when: always
+    - name: save the configuration
+      ios_config:
+        save_when: always
+      ignore_errors: yes
 
-    # - name: add student
-    #   ios_config:
-    #     lines:
-    #       - "username {{ username }} privilege 15 secret {{ password }}"
-    #     save_when: always
+    - name: change ansible host ip 
+      set_fact:
+        ansible_host: "{{ new_ip }}"
+
+    - name: add student
+      ios_config:
+        lines:
+          - "username {{ username }} privilege 15 secret {{ password }}"
+        save_when: always
       
 

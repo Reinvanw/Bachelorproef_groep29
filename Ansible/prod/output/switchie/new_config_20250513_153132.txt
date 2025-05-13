@@ -13,7 +13,7 @@ service call-home
 platform punt-keepalive disable-kernel-core
 platform management port rate-limt-enabled
 !
-hostname {{ hostname }}
+hostname switchie
 !
 !
 vrf definition Mgmt-vrf
@@ -208,7 +208,7 @@ policy-map system-cpp-policy
 !
 interface GigabitEthernet0/0
  vrf forwarding Mgmt-vrf
- ip address {{ new_ip }} 255.255.255.0
+ ip address 192.168.0.2 255.255.255.0
  negotiation auto
 !
 interface GigabitEthernet1/0/1
@@ -329,7 +329,7 @@ ip ssh authentication-retries 0
 ip ssh version 2
 ip ssh pubkey-chain
   username admin
-   key-hash ssh-rsa {{ public_key_hashed }}
+   key-hash ssh-rsa 6C4522D5291983A0DEE3A53E6F26FE1E
 !
 !
 !

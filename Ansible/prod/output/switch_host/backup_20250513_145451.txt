@@ -1,8 +1,8 @@
 Building configuration...
 
-Current configuration : 9947 bytes
+Current configuration : 10032 bytes
 !
-! Last configuration change at 07:14:53 UTC Tue May 13 2025 by admin
+! Last configuration change at 11:02:22 UTC Tue May 13 2025 by admin
 !
 version 16.12
 no service pad
@@ -13,7 +13,7 @@ service call-home
 platform punt-keepalive disable-kernel-core
 platform management port rate-limt-enabled
 !
-hostname {{ hostname }}
+hostname Switch
 !
 !
 vrf definition Mgmt-vrf
@@ -147,6 +147,7 @@ spanning-tree extend system-id
 memory free low-watermark processor 79468
 !
 username admin privilege 15 secret 9 $9$uoauzbchj3e35.$dNz/WMU/qzQKRCcFjaySPJaCxlXONVxjsZPYagrv/d2
+username student privilege 15 secret 9 $9$uoauzbchj3e35.$dNz/WMU/qzQKRCcFjaySPJaCxlXONVxjsZPYagrv/d2
 !
 redundancy
  mode sso
@@ -208,7 +209,7 @@ policy-map system-cpp-policy
 !
 interface GigabitEthernet0/0
  vrf forwarding Mgmt-vrf
- ip address {{ new_ip }} 255.255.255.0
+ ip address 192.168.0.20 255.255.255.0
  negotiation auto
 !
 interface GigabitEthernet1/0/1
@@ -329,7 +330,8 @@ ip ssh authentication-retries 0
 ip ssh version 2
 ip ssh pubkey-chain
   username admin
-   key-hash ssh-rsa {{ public_key_hashed }}
+   key-hash ssh-rsa 6BF4BE620B53169927C062A39A5EAF9D reinvanw@reinvanw-Lenovo-Legion-5-15IMH05H
+  username student
 !
 !
 !
