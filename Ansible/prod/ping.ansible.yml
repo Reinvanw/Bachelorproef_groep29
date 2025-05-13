@@ -1,0 +1,52 @@
+- name: Gather switch status facts
+  hosts: switch
+  gather_facts: no
+
+  tasks:
+
+    - name: Ping switch to verify host is up
+      shell: "ping -c 1 -W 1 {{ inventory_hostname }}"
+      register: ping_result
+      ignore_errors: yes
+      delegate_to: localhost
+
+
+    - name: Check if port 22 (SSH) is open and has banner
+      wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        timeout: 3
+        state: started
+        search_regex: "SSH"
+      register: ssh_check
+      ignore_errors: yes
+      delegate_to: localhost
+
+    - name: Save switch status as host variable
+      set_fact:
+        my_switch_status:
+          host: "{{ inventory_hostname }}"
+          pingable: "{{ ping_result is not failed }}"
+          ssh_open: "{{ ssh_check.state | default('') == 'started' }}"
+
+- name: Collect and write switch results to JSON file
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+
+    - name: Collect all switch status results as a dictionary
+      set_fact:
+        results: >-
+          {{
+            dict(
+              groups['switch'] | map('extract', hostvars, 'inventory_hostname') | zip(
+                groups['switch'] | map('extract', hostvars, 'my_switch_status') | select('defined')
+              )
+            )
+          }}
+
+    - name: Write results to JSON file
+      copy:
+        content: "{{ results | to_nice_json }}"
+        dest: "./switch_status.json"
