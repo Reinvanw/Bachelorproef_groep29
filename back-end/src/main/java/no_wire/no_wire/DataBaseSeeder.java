@@ -17,9 +17,11 @@ public class DataBaseSeeder {
 
     @Bean
     public CommandLineRunner seedData(UserRepository userRepository,
-                                      TeamRepository teamRepository,
-                                      NetworkSwitchRepository networkSwitchRepository) {
+            TeamRepository teamRepository,
+            NetworkSwitchRepository networkSwitchRepository) {
         return args -> {
+
+            // Delete all existing data
 
             // Create a NetworkSwitch instance using constructor
             NetworkSwitch networkSwitch = new NetworkSwitch("192.168.1.1", "switch1");
