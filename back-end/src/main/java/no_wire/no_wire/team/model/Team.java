@@ -15,13 +15,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import no_wire.no_wire.networkswitch.model.NetworkSwitch;
 import no_wire.no_wire.user.model.User;
-
 import java.util.ArrayList;
 import java.util.List;
-
-
-
-
 
 @Data
 @Builder
@@ -33,39 +28,23 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     private long teamID;
-    
+
     @NotNull(message = "Team name is required")
     private String teamName;
-   
+
     @Builder.Default
     @OneToMany(mappedBy = "team")
     List<User> users = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "switchID")
-    private NetworkSwitch switch0;
+    private NetworkSwitch networkSwitch;
 
-   public Team(String teamName) {
+    public Team(String teamName, NetworkSwitch networkSwitch, List<User> users) {
         setTeamName(teamName);
-        users = new ArrayList<>();
-      
+        if (networkSwitch != null)
+            this.networkSwitch = networkSwitch;
+        if (users != null)
+            this.users = users;
     }
-
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
-    }
-
-    public String getTeamName() {
-        return teamName;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-    public List<User> getUsers() {
-        return users;
-    }
-
-
- 
 }

@@ -1,6 +1,5 @@
 package no_wire.no_wire.networkswitch.repository;
 
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import no_wire.no_wire.networkswitch.model.NetworkSwitch;
@@ -12,5 +11,5 @@ public interface NetworkSwitchRepository extends JpaRepository<NetworkSwitch, Lo
 
     public List<NetworkSwitch> findAll();
 
-    
+    public NetworkSwitch findByManagementIP(String managementIP);
 }
