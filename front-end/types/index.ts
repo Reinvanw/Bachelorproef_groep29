@@ -11,3 +11,17 @@ export interface User {
     username: string,
 }
 
+export interface NetworkSwitch {
+    switchID?: number,
+    userName: string,
+    password: string,
+    managementIP: number,
+    hostname: string,
+}
+export interface Team {
+    teamID?: number;
+    teamName: string;
+    users?: User[];
+    swithch0?: NetworkSwitch;
+}
+

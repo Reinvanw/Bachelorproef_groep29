@@ -7,7 +7,7 @@ type Props = {
 };
 
 
-const ProductsOverview: React.FC<Props> = ({ users }: Props) => {
+const UsersOverview: React.FC<Props> = ({ users }: Props) => {
 
         const sortedUsers = users;
 
@@ -25,4 +25,4 @@ const ProductsOverview: React.FC<Props> = ({ users }: Props) => {
     );
 };
 
-export default ProductsOverview;
+export default UsersOverview;
