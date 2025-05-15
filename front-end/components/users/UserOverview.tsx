@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { User } from "@/types";
+import index from "swr";
 
 
 type Props = {
@@ -13,8 +14,8 @@ const UsersOverview: React.FC<Props> = ({ users }: Props) => {
 
      return (
         <> 
-            {sortedUsers.map((user) => (
-                    <article>
+            {sortedUsers.map((user, index) => (
+                    <article key={index}>
                         <h2>{user.email}</h2>
                         <p>{user.password}</p>
                     </article>
