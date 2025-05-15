@@ -22,7 +22,7 @@ const Test: React.FC = () => {
         return users;
     };
 
-    const {data, error} = useSWR('products', getUsers);
+    const {data, error} = useSWR('users', getUsers);
 
     return (
         <>
