@@ -33,12 +33,12 @@ public class NetworkSwitchRestController {
     }
 
     @GetMapping("/status/{switchId}")
-    public SwitchStatus getSwitchStatus(@PathVariable String switchId) {
+    public SwitchStatus getSwitchStatus(@PathVariable long switchId) {
         return networkSwitchService.getSwitchStatus(switchId);
     }
 
     @GetMapping("/reset/{switchId}/oldIpAddress/{oldIpAddress}")
-    public void resetSwitch(@PathVariable String switchId, @PathVariable String oldIpAddress) {
+    public void resetSwitch(@PathVariable long switchId, @PathVariable String oldIpAddress) {
         // networkSwitchService.resetSwitch(switchId, oldIpAddress);
     }
 

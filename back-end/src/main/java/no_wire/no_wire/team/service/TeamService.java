@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import no_wire.no_wire.networkswitch.model.NetworkSwitch;
-import no_wire.no_wire.networkswitch.model.SwitchStatus;
 import no_wire.no_wire.networkswitch.service.NetworkSwitchService;
 import no_wire.no_wire.team.model.Team;
 import no_wire.no_wire.team.repository.TeamRepository;
@@ -24,14 +23,14 @@ public class TeamService {
         return teamRepository.findAll();
     }
 
-    public Team getTeamById(String teamId) {
-        Team team = teamRepository.findById(Long.parseLong(teamId));
+    public Team getTeamById(long teamId) {
+        Team team = teamRepository.findById(teamId);
         if (team == null)
             throw new IllegalArgumentException("Team not found");
         return team;
     }
 
-    public Team addSwitchToTeam(String teamId, String switchId) {
+    public Team addSwitchToTeam(long teamId, long switchId) {
         Team team = getTeamById(teamId);
         if (team.getNetworkSwitch() != null)
             throw new IllegalArgumentException("Team already has a switch assigned");
@@ -40,7 +39,7 @@ public class TeamService {
         return teamRepository.save(team);
     }
 
-    public NetworkSwitch getSwitchOfTeam(String teamId) {
+    public NetworkSwitch getSwitchOfTeam(long teamId) {
         Team team = getTeamById(teamId);
         NetworkSwitch networkSwitch = team.getNetworkSwitch();
         if (networkSwitch == null)

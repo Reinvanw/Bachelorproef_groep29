@@ -1,39 +1,39 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import TeamService from '@/services/TeamService';
-import useSWR from 'swr';
-import TeamOverview from '@/components/team/TeamOverview';
-import { Team } from '@/types';
+import { useEffect } from "react";
+import useInterval from "use-interval";
+import useSWR, { mutate } from "swr";
+import { Team } from "@/types";
+import TeamService from "@/services/TeamService";
+import Table from "@/components/team/Table";
 
-const Teams: React.FC = () => {
-    const [teams, setTeams] = useState<Array<Team>>([]);
-
-    const getTeams = async () => {
-        try {
-            const fetchedTeams = await TeamService.getTeams();
-            setTeams(fetchedTeams);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
-        return teams;
-    };
-
-    const {data, error} = useSWR('products', getTeams);
-
-    return (
-        <>
-            <main>
-                {data &&(
-                    <section>
-                        <TeamOverview teams={data}/>
-                    </section>                   
-                )}
-            </main>
-        </>
-    );
+const fetchTeams = async () => {
+  const response = await TeamService.getTeams();
+  const result = await response.json();
+  return result;
 };
 
-export default Teams;
+const TeamsPage: React.FC = () => {
+  useEffect(() => {
+    mutate('fetchTeams', fetchTeams);
+  }, []);
 
+  useInterval(() => {
+    mutate("fetchTeams", fetchTeams);
+  }, 2000);
 
+  const { data: teams, error } = useSWR<Array<Team>>("fetchTeams", fetchTeams);
+
+  return (
+    <>
+      <main>
+        <div>
+          <h1>Team Overview</h1>
+              <Table teams={teams} />
+        </div>
+      </main>
+    </>
+  );
+}
+
+export default TeamsPage;

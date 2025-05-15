@@ -33,12 +33,12 @@ public class TeamRestController {
     }
 
     @GetMapping("/{teamId}/switch")
-    public NetworkSwitch getSwitchOfTeam(@PathVariable String teamId) {
+    public NetworkSwitch getSwitchOfTeam(@PathVariable long teamId) {
         return teamService.getSwitchOfTeam(teamId);
     }
 
     @PostMapping("/{teamId}/assign/switch/{switchId}")
-    public Team addSwitchToTeam(@PathVariable String teamId, @PathVariable String switchId) {
+    public Team addSwitchToTeam(@PathVariable long teamId, @PathVariable long switchId) {
         return teamService.addSwitchToTeam(teamId, switchId);
     }
 

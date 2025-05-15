@@ -8,7 +8,6 @@ export interface User {
     email: string,
     password: string,
     role: Role,
-    username: string,
 }
 
 export interface NetworkSwitch {
@@ -25,3 +24,12 @@ export interface Team {
     swithch0?: NetworkSwitch;
 }
 
+export type StatusMessage = {
+    message: string;
+    type: "error" | "success";
+};
+
+export interface Login {
+    email: string
+    password: string
+}

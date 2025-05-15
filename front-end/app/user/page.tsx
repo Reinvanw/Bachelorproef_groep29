@@ -1,42 +1,39 @@
-'use client';
+"use client";
 
-import { User } from '@/types';
-import React, { useState } from 'react';
-import UserService from '@/services/UserService';
-import useSWR from 'swr';
-import UserOverview from '@/components/users/UserOverview';
+import { useEffect } from "react";
+import useInterval from "use-interval";
+import useSWR, { mutate } from "swr";
+import { User } from "@/types";
+import UserService from "@/services/UserService";
+import Table from "@/components/user/Table";
 
-
-
-
-const Test: React.FC = () => {
-    const [users, setUsers] = useState<Array<User>>([]);
-
-    const getUsers = async () => {
-        try {
-            const fetchedUsers = await UserService.getUsers();
-            setUsers(fetchedUsers);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
-        return users;
-    };
-
-    const {data, error} = useSWR('users', getUsers);
-
-    return (
-        <>
-            <main>
-                {data &&(
-                    <section>
-                        <UserOverview users={data}/>
-                    </section>                   
-                )}
-            </main>
-        </>
-    );
+const fetchUsers = async () => {
+  const response = await UserService.getUsers();
+  const result = await response.json();
+  return result;
 };
+  
+const UsersPage: React.FC = () => {
+  useEffect(() => {
+    mutate('fetchUsers', fetchUsers);
+  }, []);
 
-export default Test;
+  useInterval(() => {
+    mutate("fetchUsers", fetchUsers);
+  }, 2000);
 
+  const { data: users, error } = useSWR<Array<User>>("fetchUsers", fetchUsers);
 
+  return (
+    <>
+      <main>
+        <div>
+          <h1>User Overview</h1>
+              <Table users={users} />
+        </div>
+      </main>
+    </>
+  );
+}
+
+export default UsersPage;

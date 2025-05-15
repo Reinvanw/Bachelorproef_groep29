@@ -1,39 +1,39 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import useSWR from 'swr';
-import { NetworkSwitch, Team } from '@/types';
-import NetworkSwitchOverview from '@/components/networkswitch/NetworkswitchOverview';
-import NetworkSwitchService from '@/services/NetworkSwitchService';
+import { useEffect } from "react";
+import useInterval from "use-interval";
+import useSWR, { mutate } from "swr";
+import { NetworkSwitch } from "@/types";
+import NetworkSwitchService from "@/services/NetworkSwitchService";
+import Table from "@/components/networkswitch/Table";
 
-const NetworkSwitches: React.FC = () => {
-    const [networkSwitches, setNetworkSwitches] = useState<Array<NetworkSwitch>>([]);
-
-    const getNetworkSwitches = async () => {
-        try {
-            const fetchedNetworkSwitches = await NetworkSwitchService.getNetworkSwitches();
-            setNetworkSwitches(fetchedNetworkSwitches);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
-        return networkSwitches;
-    };
-
-    const {data, error} = useSWR('products', getNetworkSwitches);
-
-    return (
-        <>
-            <main>
-                {data &&(
-                    <section>
-                        <NetworkSwitchOverview networkSwitches={data}/>
-                    </section>                   
-                )}
-            </main>
-        </>
-    );
+const fetchNetworkSwitches = async () => {
+  const response = await NetworkSwitchService.getNetworkSwitches();
+  const result = await response.json();
+  return result;
 };
 
-export default NetworkSwitches;
+const NetworkSwitchesPage: React.FC = () => {
+  useEffect(() => {
+    mutate('fetchNetworkSwitches', fetchNetworkSwitches);
+  }, []);
 
+  useInterval(() => {
+    mutate("fetchNetworkSwitches", fetchNetworkSwitches);
+  }, 2000);
 
+  const { data: networkSwitches, error } = useSWR<Array<NetworkSwitch>>("fetchNetworkSwitches", fetchNetworkSwitches);
+
+  return (
+    <>
+      <main>
+        <div>
+          <h1>NetworkSwitch Overview</h1>
+              <Table networkSwitches={networkSwitches} />
+        </div>
+      </main>
+    </>
+  );
+}
+
+export default NetworkSwitchesPage;

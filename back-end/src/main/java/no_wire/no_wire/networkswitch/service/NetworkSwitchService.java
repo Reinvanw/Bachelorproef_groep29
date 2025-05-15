@@ -1,7 +1,5 @@
 package no_wire.no_wire.networkswitch.service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +26,14 @@ public class NetworkSwitchService {
         return networkswitchRepository.findAll();
     }
 
-    public NetworkSwitch getNetworkSwitchById(String switchId) {
-        NetworkSwitch networkSwitch = networkswitchRepository.findById(Long.parseLong(switchId));
+    public NetworkSwitch getNetworkSwitchById(long switchId) {
+        NetworkSwitch networkSwitch = networkswitchRepository.findById(switchId);
         if (networkSwitch == null)
             throw new IllegalArgumentException("Switch not found");
         return networkSwitch;
     }
 
-    public SwitchStatus getSwitchStatus(String switchId) {
+    public SwitchStatus getSwitchStatus(long switchId) {
         NetworkSwitch networkSwitch = getNetworkSwitchById(switchId);
         Ping pingResponse = pingService.ping(networkSwitch.getManagementIP());
         if (pingResponse.isReachable())
@@ -56,7 +54,7 @@ public class NetworkSwitchService {
             throw new IllegalArgumentException("IP address already assigned to a switch");
     }
 
-    public void resetSwitch(String switchId, String oldIpAddress) {
+    public void resetSwitch(long switchId, String oldIpAddress) {
         // TODO
     }
 }
