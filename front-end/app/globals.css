@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+
+
+:root {
+  --background: #ffffff;
+
+  --blauw-logo: #02647e;
+}
+
+.text-blauw-logo {
+  color: var(--blauw-logo);
+}
+.hover\:text-blauw-logo:hover {
+  color: var(--blauw-logo);
+}
+.bg-blauw-logo {
+  background-color: var(--blauw-logo);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ededed;
+    --foreground: #ededed;
+  }
+}
+
+.shadow-top {
+  box-shadow: 0 -4px 8px -4px rgba(0,0,0,0.08);
+}
+
+body {
+  background: var(--foreground);
+  color: #4a4a4a;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+}
