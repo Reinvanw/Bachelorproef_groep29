@@ -18,7 +18,7 @@ const Table: React.FC<Props> = ({ teams = [] }: Props) => {
                         <th className="px-6 py-3 text-xs font-semibold text-white bg-blauw-logo border border-gray-200 text-center">Switch name</th>
                         <th className="px-6 py-3 text-xs font-semibold text-white bg-blauw-logo border border-gray-200 text-center">Switch IP</th>
                         <th className="px-6 py-3 text-xs font-semibold text-white bg-blauw-logo border border-gray-200 text-center">Status</th>
-                        <th className="px-6 py-3 text-xs font-semibold text-white bg-blauw-logo border border-gray-200 text-center">Reset</th>
+                        <th className="px-6 py-3 text-xs font-semibold text-white bg-blauw-logo border border-gray-200 text-center">Reset Switch</th>
                     </tr>
                 </thead>
                 <tbody>

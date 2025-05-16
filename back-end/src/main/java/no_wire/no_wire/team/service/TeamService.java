@@ -46,5 +46,12 @@ public class TeamService {
             throw new IllegalArgumentException("No switch assigned to this team");
         return networkSwitch;
     }
+    public void deleteTeam(long id) {
+        Team team = teamRepository.findById(id);
+        if (team == null) {
+            throw new IllegalArgumentException("Team not found");
+        }
+        teamRepository.deleteById(id);
+    }
 
 }
