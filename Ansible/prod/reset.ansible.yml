@@ -71,11 +71,17 @@
           filename: "backup_{{ timestamp }}.txt"
           dir_path: "{{ playbook_dir }}/output/{{ hostname }}"
 
+    - name: Copy file to Cisco switch using SCP
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/output/{{ hostname }}/new_config_{{ timestamp }}.txt"
+        dest: bootflash:/test.txt
+      delegate_to: localhost
+
+    - fail:
     - name: Copy custom configuration file to the switch
       ios_config:
         src: "{{ playbook_dir }}/output/{{ hostname }}/new_config_{{ timestamp }}.txt" 
         save_when: changed
-        timeout: 10
       ignore_errors: yes
 
     - name: save the configuration
