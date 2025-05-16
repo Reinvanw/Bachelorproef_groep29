@@ -14,6 +14,7 @@ import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataBaseSeeder {
@@ -21,7 +22,7 @@ public class DataBaseSeeder {
     @Bean
     public CommandLineRunner seedData(UserRepository userRepository,
             TeamRepository teamRepository,
-            NetworkSwitchRepository networkSwitchRepository) {
+            NetworkSwitchRepository networkSwitchRepository, PasswordEncoder passwordEncoder) {
         return args -> {
 
             // Delete all existing data
@@ -30,19 +31,19 @@ public class DataBaseSeeder {
             networkSwitchRepository.deleteAll();
 
             // Create lecturer
-            User lecturer = new User("robin@example.com", "password789", Role.ROLE_LECTURER);
+            User lecturer = new User("robin@ucll.be", passwordEncoder.encode("password123"), Role.ROLE_LECTURER);
             userRepository.save(lecturer);
 
             // Create students
-            User user1 = new User("user1@example.com", "password123", Role.ROLE_STUDENT);
+            User user1 = new User("user1@ucll.be", passwordEncoder.encode("password123"), Role.ROLE_STUDENT);
             userRepository.save(user1);
-            User user2 = new User("user2@example.com", "password456", Role.ROLE_STUDENT);
+            User user2 = new User("user2@ucll.be", passwordEncoder.encode("password123"), Role.ROLE_STUDENT);
             userRepository.save(user2);
-            User user3 = new User("user3@example.com", "password123", Role.ROLE_STUDENT);
+            User user3 = new User("user3@ucll.be", passwordEncoder.encode("password123"), Role.ROLE_STUDENT);
             userRepository.save(user3);
-            User user4 = new User("user4@example.com", "password456", Role.ROLE_STUDENT);
+            User user4 = new User("user4@ucll.be", passwordEncoder.encode("password123"), Role.ROLE_STUDENT);
             userRepository.save(user4);
-            User user5 = new User("user5@example.com", "password456", Role.ROLE_STUDENT);
+            User user5 = new User("user5@ucll.be", passwordEncoder.encode("password123"), Role.ROLE_STUDENT);
             userRepository.save(user5);
 
             // Create switches

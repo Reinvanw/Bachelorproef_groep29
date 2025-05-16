@@ -49,7 +49,8 @@ const Footer: React.FC<Props> = ({}: Props) => {
             <div className="flex justify-center items-center py-4 text-gray-500 text-sm">
                 <span className="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded">
                     LabLink all rights reserved
-                    <span className="mx-1"><FaRegCopyright /></span>2025
+                    <span className="mx-1"><FaRegCopyright /></span>
+                    2025
                 </span>
             </div>
         </footer>
