@@ -1,9 +1,10 @@
 "use client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import Table from "@/components/team/Table";
+// Update the import path below if the Table component is located elsewhere
 import { useEffect, useState } from "react";
 import teamService from "@/services/TeamService";
+import Table from "@/components/tableOverview/Table";
 
 const HomePage: React.FC = () => {
   const [teams, setTeams] = useState([]);
