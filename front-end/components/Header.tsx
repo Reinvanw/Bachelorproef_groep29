@@ -8,7 +8,7 @@ type Props = {};
 
 const Header: React.FC<Props> = ({ }: Props) => {
     return (
-        <header className="bg-white shadow-md">
+        <header className="bg-white shadow-md sticky top-0 z-50">
             <nav className="flex justify-between items-center px-4 py-4">
 
                 <Link href="/">

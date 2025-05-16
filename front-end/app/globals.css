@@ -29,6 +29,10 @@
   }
 }
 
+.shadow-top {
+  box-shadow: 0 -4px 8px -4px rgba(0,0,0,0.08);
+}
+
 body {
   background: var(--foreground);
   color: #4a4a4a;
