@@ -1,0 +1,33 @@
+
+- name: Check if backend URL is present
+  assert:
+    that:
+      - backend_url is defined
+    fail_msg: "Backend URL is not defined. Please set the backend_url variable."
+    success_msg: "Backend URL is defined."
+  connection: local
+
+- name: Check if job token is present
+  assert:
+    that:
+      - job_token is defined
+    fail_msg: "Job token is not defined. Please set the job_token variable."
+    success_msg: "Job token is defined."
+  connection: local
+
+- name: Check if username is present
+  assert:
+    that:
+      - username is defined
+    fail_msg: "Username is not defined. Please set the username variable."
+    success_msg: "Username is defined."
+  connection: local
+
+- name: Check if password is present
+  assert:
+    that:
+      - password is defined
+    fail_msg: "Password is not defined. Please set the password variable."
+    success_msg: "Password is defined."
+  connection: local
+    

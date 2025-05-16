@@ -1,0 +1,247 @@
+---
+- name: Validate VLAN Configuration Compliance
+  hosts: switch
+  gather_facts: no
+  vars:
+    required_trunk_all_vlans: 1
+    required_trunk_three_vlans: 3
+    required_router_trunk: 1
+    mandatory_vlans: [lan, guest, mgmt]
+
+  tasks:
+    - name: Get VLAN name to ID mapping
+      ios_command:
+        commands:
+          - show vlan brief
+      register: vlan_brief_output
+
+    - name: Parse VLAN name to ID map (as string)
+      set_fact:
+        vlan_name_map_raw: >-
+          {% set result = {} %}
+          {% for line in vlan_brief_output.stdout[0].split('\n') %}
+            {% if line.strip() and not line.startswith('VLAN') and not line.startswith('----') %}
+              {% set parts = line.split() %}
+              {% if parts | length >= 2 %}
+                {% set vlan_id = parts[0] %}
+                {% set vlan_name = parts[1] %}
+                {% if vlan_id is match('^\\d+$') %}
+                  {% set _ = result.update({vlan_name: vlan_id}) %}
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {{ result | to_json }}
+
+    - name: Convert raw VLAN name map string to dict
+      set_fact:
+        vlan_name_map: "{{ vlan_name_map_raw | from_json }}"
+
+    - name: Debug VLAN name map
+      debug:
+        var: vlan_name_map
+
+
+    - name: Build list of mandatory VLAN IDs from names
+      set_fact:
+        mandatory_vlan_ids: >-
+          {{
+            mandatory_vlans
+            | select('in', vlan_name_map.keys())
+            | map('extract', vlan_name_map)
+            | map('int')
+            | list
+          }}
+
+
+    - name: Get switchport info
+      ios_command:
+        commands: show interfaces switchport
+      register: switchport_output
+
+    - name: Parse switchport information
+      vars:
+        interfaces: >-
+          {%- set interfaces = [] -%}
+          {%- for block in switchport_output.stdout[0].split('\n\n') -%}
+            {%- if block.strip() -%}
+              {%- set interface = {'name': '', 'mode': '', 'vlans': '', 'description': ''} -%}
+              {%- for line in block.split('\n') -%}
+                {%- if line.startswith('Name:') -%}
+                  {%- set _ = interface.update({'name': line.split(':')[1].strip()}) -%}
+                {%- elif 'Administrative Mode:' in line -%}
+                  {%- set _ = interface.update({'mode': line.split(':')[1].strip().lower()}) -%}
+                {%- elif 'Trunking VLANs Enabled:' in line -%}
+                  {%- set vlans = line.split(':')[1].strip() -%}
+                  {%- if ',' in vlans -%}
+                    {%- set vlans = vlans.split(',') | map('trim') | join(',') -%}
+                  {%- endif -%}
+                  {%- set _ = interface.update({'vlans': vlans.lower()}) -%}
+                {%- elif 'Description:' in line -%}
+                  {%- set _ = interface.update({'description': line.split(':')[1].strip().lower()}) -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if interface.name -%}
+                {%- set _ = interfaces.append(interface) -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {{ interfaces }}
+
+      set_fact:
+        parsed_interfaces: "{{ interfaces }}"
+
+    - name: Debug parsed interfaces
+      debug:
+        var: parsed_interfaces
+
+    - name: Initialize trunk_interfaces dict
+      set_fact:
+        trunk_interfaces: {}
+
+    - name: Add trunk interfaces to dict
+      set_fact:
+        trunk_interfaces: "{{ trunk_interfaces | combine({ item.name: item }) }}"
+      loop: "{{ parsed_interfaces }}"
+      when: item.mode == 'trunk'
+
+    - name: Debug trunk interfaces
+      debug:
+        var: trunk_interfaces
+
+    - name: Initialize validation results
+      set_fact:
+        validation_results: >
+          {{
+            validation_results | default({}) | combine({
+              inventory_hostname: {
+                "trunk_all_vlans": {"count": 0, "interfaces": []},
+                "trunk_three_vlans": {"count": 0, "interfaces": []},
+                "router_trunk": {"count": 0, "interfaces": []},
+                "issues": []
+              }
+            })
+          }}
+
+    - name: Set variables for current interface
+      set_fact:
+        interface_name: "{{ item.key }}"
+        interface_info: "{{ item.value }}"
+        trunk_vlans_list: >-
+          {{
+            (item.value.vlans.split(',') if item.value.vlans != 'all' else [])
+            | map('trim') | map('int') | list
+          }}
+      loop: "{{ trunk_interfaces | dict2items }}"
+      loop_control:
+        loop_var: item
+
+    - name: Update validation_results for trunk interface (if applicable)
+      set_fact:
+        validation_results: >-
+          {{
+            validation_results | combine({
+              inventory_hostname: (
+                validation_results[inventory_hostname]
+                | combine({
+                    'trunk_all_vlans': {
+                      'count': (
+                        validation_results[inventory_hostname].trunk_all_vlans.count
+                        + (1 if item.value.mode == 'trunk' and item.value.vlans | lower == 'all' else 0)
+                      ),
+                      'interfaces': (
+                        validation_results[inventory_hostname].trunk_all_vlans.interfaces
+                        + ([item.key] if item.value.mode == 'trunk' and item.value.vlans | lower == 'all' else [])
+                      )
+                    },
+                    'trunk_three_vlans': {
+                      'count': (
+                        validation_results[inventory_hostname].trunk_three_vlans.count
+                        + (1 if
+                            item.value.mode == 'trunk' and
+                            mandatory_vlan_ids | difference(
+                              (item.value.vlans.split(',') if item.value.vlans != 'all' else [])
+                              | map('trim') | map('int') | list
+                            ) | length == 0 and
+                            ((item.value.vlans.split(',') if item.value.vlans != 'all' else [])
+                              | map('trim') | map('int') | list | length) == mandatory_vlan_ids | length
+                          else 0)
+                      ),
+                      'interfaces': (
+                        validation_results[inventory_hostname].trunk_three_vlans.interfaces
+                        + ([item.key] if
+                            item.value.mode == 'trunk' and
+                            mandatory_vlan_ids | difference(
+                              (item.value.vlans.split(',') if item.value.vlans != 'all' else [])
+                              | map('trim') | map('int') | list
+                            ) | length == 0 and
+                            ((item.value.vlans.split(',') if item.value.vlans != 'all' else [])
+                              | map('trim') | map('int') | list | length) == mandatory_vlan_ids | length
+                          else [])
+                      )
+                    },
+                    'router_trunk': {
+                      'count': (
+                        validation_results[inventory_hostname].router_trunk.count
+                        + (1 if
+                            item.value.mode == 'trunk' and
+                            (
+                              'router' in (item.value.description | default('') | lower) or
+                              'uplink' in (item.value.description | default('') | lower)
+                            )
+                          else 0)
+                      ),
+                      'interfaces': (
+                        validation_results[inventory_hostname].router_trunk.interfaces
+                        + ([item.key] if
+                            item.value.mode == 'trunk' and
+                            (
+                              'router' in (item.value.description | default('') | lower) or
+                              'uplink' in (item.value.description | default('') | lower)
+                            )
+                          else [])
+                      )
+                    }
+                  })
+              )
+            })
+          }}
+      loop: "{{ trunk_interfaces | dict2items }}"
+      loop_control:
+        loop_var: item
+
+
+
+    - name: Validate requirements
+      set_fact:
+        validation_results: "{{ validation_results | combine({ inventory_hostname: host_results | combine({'issues': issues}) }) }}"
+      vars:
+        host_results: "{{ validation_results[inventory_hostname] }}"
+        issues: >-
+          {% set output = [] %}
+          {% if host_results.trunk_all_vlans.count != required_trunk_all_vlans %}
+            {% set _ = output.append('Missing trunk-all VLAN port (needs ' ~ required_trunk_all_vlans ~ ', found ' ~ host_results.trunk_all_vlans.count ~ ')') %}
+          {% endif %}
+          {% if host_results.trunk_three_vlans.count < required_trunk_three_vlans %}
+            {% set _ = output.append('Missing three-VLAN trunk ports (needs ' ~ required_trunk_three_vlans ~ ', found ' ~ host_results.trunk_three_vlans.count ~ ')') %}
+          {% endif %}
+          {% if host_results.router_trunk.count < required_router_trunk %}
+            {% set _ = output.append('Missing router trunk port (needs ' ~ required_router_trunk ~ ', found ' ~ host_results.router_trunk.count ~ ')') %}
+          {% endif %}
+          {{ output }}
+
+    - name: Create output directory
+      file:
+        path: "{{ playbook_dir }}/output/vlan_validation"
+        state: directory
+        mode: '0755'
+
+    - name: Save results to JSON
+      copy:
+        content: "{{ validation_results | to_nice_json }}"
+        dest: "{{ playbook_dir }}/output/vlan_validation/{{ inventory_hostname }}_vlan_validation.json"
+        mode: '0644'
+
+    - name: Show validation results
+      debug:
+        var: validation_results

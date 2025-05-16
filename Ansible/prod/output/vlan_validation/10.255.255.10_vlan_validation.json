@@ -1,0 +1,23 @@
+{
+    "10.255.255.10": {
+        "issues": "      ['Missing router trunk port (needs 1, found 0)']",
+        "router_trunk": {
+            "count": 0,
+            "interfaces": []
+        },
+        "trunk_all_vlans": {
+            "count": 1,
+            "interfaces": [
+                "Gi1/0/1"
+            ]
+        },
+        "trunk_three_vlans": {
+            "count": 3,
+            "interfaces": [
+                "Gi1/0/2",
+                "Gi1/0/3",
+                "Gi1/0/4"
+            ]
+        }
+    }
+}

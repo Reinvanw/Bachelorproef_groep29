@@ -1,0 +1,10 @@
+# sends api request to update the status
+
+- name: Update job status
+  uri:
+    url: "https://{{ backend_url }}/update_status"
+    method: POST
+    json:
+      token: "{{ job_token }}"
+      status: "{{ status }}"
+      message: "{{ message }}"

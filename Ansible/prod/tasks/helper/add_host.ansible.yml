@@ -1,0 +1,8 @@
+- name: Add host to dynamic inventory
+  add_host:
+    name: "{{ hostname }}" # no underscore or dash
+    groups: server_group
+    ansible_host: "{{ host_ip }}"
+    ansible_user: "{{ username }}"
+    ansible_password: "{{ password }}"
+    ansible_become_password: "{{ sudo_password | default(password) }}"
