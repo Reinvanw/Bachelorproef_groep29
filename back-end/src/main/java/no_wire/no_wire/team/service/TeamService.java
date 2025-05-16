@@ -1,5 +1,6 @@
 package no_wire.no_wire.team.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +10,20 @@ import no_wire.no_wire.networkswitch.model.NetworkSwitch;
 import no_wire.no_wire.networkswitch.service.NetworkSwitchService;
 import no_wire.no_wire.team.model.Team;
 import no_wire.no_wire.team.repository.TeamRepository;
+import no_wire.no_wire.user.model.User;
+import no_wire.no_wire.user.service.UserService;
 
 @Service
 public class TeamService {
 
     @Autowired
     private TeamRepository teamRepository;
-
     @Autowired
     private NetworkSwitchService networkSwitchService;
+
+    @Autowired
+    private UserService userService;
+  
 
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
@@ -53,5 +59,20 @@ public class TeamService {
         }
         teamRepository.deleteById(id);
     }
+public Team addUserToTeam(long teamId, long userId) {
+    Team team = getTeamById(teamId);
+    User user = userService.getUserById(userId);
+    if (user == null) {
+        throw new IllegalArgumentException("User not found");
+    }
+    if (team.getUsers() == null) {
+        team.setUsers(new ArrayList<>());
+    }
+    if (team.getUsers().contains(user)) {
+        throw new IllegalArgumentException("User already in team");
+    }
+    team.getUsers().add(user);
+    return teamRepository.save(team);
+}
 
 }

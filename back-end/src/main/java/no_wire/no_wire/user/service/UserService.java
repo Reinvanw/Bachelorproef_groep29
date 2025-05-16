@@ -22,4 +22,11 @@ public class UserService {
             throw new IllegalArgumentException("User not found");
         return user;
     }
+
+    public User getUserById(long userId) {
+        User user = userRepository.findById(userId);
+        if (user == null)
+            throw new IllegalArgumentException("User not found");
+        return user;
+    }
 }

@@ -33,6 +33,11 @@ public class TeamRestController {
         return teamService.getAllTeams();
     }
 
+    @GetMapping("/{teamId}")
+    public Team getTeamById(@PathVariable long teamId) {
+        return teamService.getTeamById(teamId);
+    }
+
     @GetMapping("/{teamId}/switch")
     public NetworkSwitch getSwitchOfTeam(@PathVariable long teamId) {
         return teamService.getSwitchOfTeam(teamId);
@@ -46,6 +51,11 @@ public class TeamRestController {
     @DeleteMapping("/delete/{id}")
     public void deleteTeam(@PathVariable long id) {
         teamService.deleteTeam(id);
+    }
+
+    @PostMapping("/{teamId}/add/{userId}")
+    public Team addUserToTeam(@PathVariable long teamId, @PathVariable long userId) {
+        return teamService.addUserToTeam(teamId, userId);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

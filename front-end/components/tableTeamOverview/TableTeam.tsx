@@ -9,7 +9,7 @@ type Props = {
 const Table: React.FC<Props> = ({ teams = [], onDeleteTeam }: Props) => {
     const handleDelete = async (teamID: number) => {
         await teamService.deleteTeam(teamID);
-        if (onDeleteTeam) onDeleteTeam(teamID); // Optionally update state in parent
+        if (onDeleteTeam) onDeleteTeam(teamID); 
     };
 
     return (
