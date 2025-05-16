@@ -6,7 +6,7 @@ type Props = {
 
 const Table: React.FC<Props> = ({ teams = [] }: Props) => {
     return (
-        <div className="mt-20 verflow-x-auto mx-auto w-[90vw] max-w-6xl">
+        <div className="mt-10 verflow-x-auto mx-auto w-[90vw] max-w-6xl">
             <table className="min-w-full bg-white rounded-xl overflow-hidden ">
                 <thead>
                     <tr className="border-b border-gray-200 bg-gray-100 text-gray-600 text-xs font-semibold tracking-wider">

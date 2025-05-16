@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
     <>
       <Header />
       <main className="flex flex-col">
-        <h1 className="mt-30 text-6xl font-medium  mx-auto w-[90vw] max-w-6xl">Overview</h1>
+        <h1 className="mt-10 text-2xl font-medium  mx-auto w-[90vw] max-w-6xl">Overview</h1>
         <Table teams={teams} />
       </main>
       <Footer />
