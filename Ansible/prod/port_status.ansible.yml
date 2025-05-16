@@ -1,0 +1,58 @@
+- name: Check switch port status and MAC address
+  hosts: switch
+  gather_facts: no
+
+  tasks:
+    - name: Gather IOS facts including interface status
+      cisco.ios.ios_facts:
+        gather_subset:
+          - interfaces
+          - config
+      register: ios_facts
+
+    - name: Extract connected interfaces
+      set_fact:
+        connected_ports: >-
+          {{
+            ios_facts.ansible_facts.ansible_net_interfaces
+            | dict2items
+            | selectattr('value.operstatus', 'eq', 'up')
+            | selectattr('value.lineprotocol', 'eq', 'up')
+            | map(attribute='key')
+            | list
+          }}
+
+    - name: Get MAC address table for each connected interface
+      ios_command:
+        commands:
+          - "show mac address-table interface {{ item }}"
+      loop: "{{ connected_ports }}"
+      register: mac_results
+
+    - name: Create structured data dictionary
+      set_fact:
+        switch_data: >-
+          {{
+            {
+              inventory_hostname: {
+                'host': inventory_hostname,
+                'interfaces': dict(
+                  connected_ports | zip(
+                    mac_results.results | map(attribute='stdout.0') | map('regex_findall', '([0-9a-fA-F]{4}\.[0-9a-fA-F]{4}\.[0-9a-fA-F]{4})')
+                  )
+                )
+              }
+            }
+          }}
+
+    - name: Create output directory
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/output"
+        state: directory
+        mode: '0755'
+
+    - name: Save data to JSON file
+      ansible.builtin.copy:
+        content: "{{ switch_data | to_nice_json }}"
+        dest: "{{ playbook_dir }}/output/switch_interfaces/switch_mac_data.json"
+        mode: '0644'

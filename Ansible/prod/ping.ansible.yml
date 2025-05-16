@@ -49,4 +49,4 @@
     - name: Write results to JSON file
       copy:
         content: "{{ results | to_nice_json }}"
-        dest: "./switch_status.json"
+        dest: "./output/ping/switch_status.json"
