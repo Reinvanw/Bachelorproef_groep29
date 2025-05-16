@@ -19,7 +19,7 @@ const Header: React.FC<Props> = ({ }: Props) => {
                     <Link href="/" className="hover:text-blauw-logo transition-colors duration-200">
                         Home
                     </Link>
-                    <Link href="/teams" className="hover:text-blauw-logo transition-colors duration-200">
+                    <Link href="/team" className="hover:text-blauw-logo transition-colors duration-200">
                         Teams
                     </Link>
                     <Link href="/networkswitch" className="hover:text-blauw-logo transition-colors duration-200">

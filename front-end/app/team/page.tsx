@@ -5,7 +5,9 @@ import useInterval from "use-interval";
 import useSWR, { mutate } from "swr";
 import { Team } from "@/types";
 import TeamService from "@/services/TeamService";
-import Table from "@/components/team/Table";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import TableTeam from "@/components/tableTeamOverview/TableTeam";
 
 const fetchTeams = async () => {
   const response = await TeamService.getTeams();
@@ -26,12 +28,15 @@ const TeamsPage: React.FC = () => {
 
   return (
     <>
+     <Header />
       <main>
+       
         <div>
-          <h1>Team Overview</h1>
-              <Table teams={teams} />
+          <h1 className="mt-10 text-2xl font-medium  mx-auto w-[90vw] max-w-6xl">Team Overview</h1>
+              <TableTeam teams={teams} />
         </div>
       </main>
+      <Footer />
     </>
   );
 }
